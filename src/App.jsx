@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import Post from "./components/Post";
 import "./App.css";
+import { useAuth } from "./AuthContext";
 
 function App() {
   const [posts, setPosts] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { logout, user } = useAuth();
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -13,7 +15,7 @@ function App() {
         const response = await fetch("http://localhost:3000/posts/", {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsImlhdCI6MTc4OTk0NjE5Nn0.AE1UP8yntBwgetyOKsFdMmaNlAiL9mCwKAicq-DPciI`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
         if (!response.ok) {
@@ -29,10 +31,24 @@ function App() {
       }
     };
     fetchPosts();
+    console.log(user);
   }, []);
 
   if (loading) {
     return <h1>loading</h1>;
+  }
+
+  if (!user) {
+    return (
+      <>
+        <div>
+          <h1>
+            <a href="/login">login</a> or <a href="/signup">sign up</a> to
+            continue
+          </h1>
+        </div>
+      </>
+    );
   }
 
   return (
@@ -42,6 +58,7 @@ function App() {
           <Post key={post.id} post={post} />
         ))}
       </div>
+      <button onClick={() => logout()}>LOG OUT</button>
     </>
   );
 }

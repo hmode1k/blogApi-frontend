@@ -18,13 +18,11 @@ function Post({ post: { id, title, content, created_at } }) {
             },
           },
         );
-        console.log(response);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
-        console.log(data);
         setComments(data);
       } catch (err) {
         setError(err.message);
